@@ -5,36 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Corbchops Music Collection</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: system-ui, sans-serif;
       background-color: #1e1e1e;
       color: #e0e0e0;
     }
-
     header {
       text-align: center;
       padding: 1rem;
       background-color: #2c2c2c;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
     }
-
     h1 {
       margin: 0;
       font-size: 2rem;
       letter-spacing: 1px;
     }
-
     .tab-bar {
       display: flex;
       justify-content: center;
       background-color: #2c2c2c;
     }
-
     .tab-button {
       padding: 0.75rem 1.5rem;
       border: none;
@@ -45,16 +38,11 @@
       border-bottom: 2px solid transparent;
       transition: background-color 0.2s ease, transform 0.2s ease;
     }
-
-    .tab-button:hover {
-      background-color: #3a3a3a;
-    }
-
+    .tab-button:hover { background-color: #3a3a3a; }
     .tab-button.active {
       color: #fff;
       border-color: #f0f0f0;
     }
-
     .view {
       padding: 1rem;
       display: none;
@@ -62,7 +50,6 @@
       transform: translateY(10px);
       transition: opacity 0.3s ease, transform 0.3s ease;
     }
-
     .grid {
       display: grid;
       gap: 1rem;
@@ -70,7 +57,6 @@
       margin-top: 1rem;
       animation: gridFade 0.3s ease-in;
     }
-
     .album-card {
       background-color: #333;
       padding: 0.75rem;
@@ -81,18 +67,15 @@
       transform: translateY(10px);
       animation: fadeIn 0.5s forwards;
     }
-
     .album-card:hover {
       transform: translateY(-4px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
     }
-
     .album-card strong {
       display: block;
       margin-bottom: 0.5rem;
       color: #fff;
     }
-
     input,
     select,
     button {
@@ -104,70 +87,45 @@
       background-color: #444;
       color: #fff;
     }
-
     button:hover {
       background-color: #555;
       cursor: pointer;
       transform: scale(1.05);
     }
-
     .filter-group {
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
       margin-bottom: 1rem;
     }
-
     @keyframes fadeIn {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      to { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes gridFade {
-      from {
-        opacity: 0;
-        transform: scale(0.98);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
     }
-
     @media (max-width: 600px) {
-      .album-card {
-        font-size: 0.9rem;
-      }
-
-      .tab-button {
-        padding: 0.5rem 1rem;
-      }
-
-      .filter-group {
-        flex-direction: column;
-      }
+      .album-card { font-size: 0.9rem; }
+      .tab-button { padding: 0.5rem 1rem; }
+      .filter-group { flex-direction: column; }
     }
   </style>
 </head>
 <body>
-
   <header>
     <h1>🎧 Corbchops Music Collection</h1>
   </header>
-
   <div class="tab-bar">
     <button class="tab-button active" onclick="switchTab('search')">Search</button>
     <button class="tab-button" onclick="switchTab('collection')">Collection</button>
   </div>
-
   <div id="searchView" class="view" style="display: block; opacity: 1; transform: translateY(0);">
     <input type="text" id="searchInput" placeholder="Search albums...">
+    <button onclick="searchAlbums()">🔍 Search</button>
     <button onclick="scanBarcode()">📷 Scan Barcode</button>
     <div id="searchResults" class="grid"></div>
   </div>
-
   <div id="collectionView" class="view">
     <div class="filter-group">
       <input type="text" id="collectionSearch" placeholder="Search your collection..." oninput="applyFilters()">
@@ -177,43 +135,46 @@
       <select id="filterGenre" onchange="applyFilters()">
         <option value="">All Genres</option>
       </select>
+      <select id="filterFormat" onchange="applyFilters()">
+        <option value="">All Formats</option>
+      </select>
+      <button onclick="pickRandomAlbum()">🎲 Random Album</button>
     </div>
     <div id="collectionGrid" class="grid"></div>
   </div>
-
   <script>
     let collection = [];
-
     function switchTab(tab) {
-      const searchView = document.getElementById('searchView');
-      const collectionView = document.getElementById('collectionView');
-      const isSearch = tab === 'search';
-
-      const fadeOut = el => {
+      const views = { search: 'searchView', collection: 'collectionView' };
+      Object.values(views).forEach(id => {
+        const el = document.getElementById(id);
         el.style.opacity = 0;
         el.style.transform = 'translateY(10px)';
         setTimeout(() => { el.style.display = 'none'; }, 250);
-      };
-
-      const fadeIn = el => {
-        el.style.display = 'block';
-        setTimeout(() => {
-          el.style.opacity = 1;
-          el.style.transform = 'translateY(0)';
-        }, 20);
-      };
-
-      if (isSearch) {
-        fadeOut(collectionView);
-        fadeIn(searchView);
-      } else {
-        fadeOut(searchView);
-        fadeIn(collectionView);
-        applyFilters();
-      }
-
+      });
+      const newView = document.getElementById(views[tab]);
+      newView.style.display = 'block';
+      setTimeout(() => {
+        newView.style.opacity = 1;
+        newView.style.transform = 'translateY(0)';
+      }, 20);
       document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
       document.querySelector(`.tab-button[onclick*="${tab}"]`).classList.add('active');
+      if (tab === 'collection') applyFilters();
+    }
+
+    async function searchAlbums() {
+      const query = document.getElementById('searchInput').value;
+      const token = 'qvvaDxgFeiDIDQEBYwGqAKRZzXAfqYJbCrjWIBzL';
+      const res = await fetch(`https://api.discogs.com/database/search?q=${encodeURIComponent(query)}&type=release&token=${token}`);
+      const data = await res.json();
+      const albums = data.results.map(item => ({
+        title: item.title,
+        artist: item.artist,
+        genre: item.genre?.[0] || 'Unknown',
+        format: item.format?.[0] || 'Unknown'
+      }));
+      displaySearchResults(albums);
     }
 
     function scanBarcode() {
@@ -251,31 +212,21 @@
     function updateCollectionView() {
       const artistSet = new Set();
       const genreSet = new Set();
+      const formatSet = new Set();
       const artistSelect = document.getElementById('filterArtist');
       const genreSelect = document.getElementById('filterGenre');
-
+      const formatSelect = document.getElementById('filterFormat');
       artistSelect.innerHTML = `<option value="">All Artists</option>`;
       genreSelect.innerHTML = `<option value="">All Genres</option>`;
-
+      formatSelect.innerHTML = `<option value="">All Formats</option>`;
       collection.forEach(album => {
         artistSet.add(album.artist);
         genreSet.add(album.genre);
+        formatSet.add(album.format);
       });
-
-      [...artistSet].sort().forEach(artist => {
-        const opt = document.createElement('option');
-        opt.value = artist;
-        opt.textContent = artist;
-        artistSelect.appendChild(opt);
-      });
-
-      [...genreSet].sort().forEach(genre => {
-        const opt = document.createElement('option');
-        opt.value = genre;
-        opt.textContent = genre;
-        genreSelect.appendChild(opt);
-      });
-
+      [...artistSet].sort().forEach(val => artistSelect.add(new Option(val, val)));
+      [...genreSet].sort().forEach(val => genreSelect.add(new Option(val, val)));
+      [...formatSet].sort().forEach(val => formatSelect.add(new Option(val, val)));
       applyFilters();
     }
 
@@ -283,17 +234,16 @@
       const query = document.getElementById('collectionSearch').value.toLowerCase();
       const artistFilter = document.getElementById('filterArtist').value;
       const genreFilter = document.getElementById('filterGenre').value;
+      const formatFilter = document.getElementById('filterFormat').value;
       const grid = document.getElementById('collectionGrid');
-
       grid.innerHTML = '';
       collection
         .filter(album => {
-          const matchesQuery =
-            album.title.toLowerCase().includes(query) ||
-            album.artist.toLowerCase().includes(query);
+          const matchesQuery = album.title.toLowerCase().includes(query) || album.artist.toLowerCase().includes(query);
           const matchesArtist = !artistFilter || album.artist === artistFilter;
           const matchesGenre = !genreFilter || album.genre === genreFilter;
-          return matchesQuery && matchesArtist && matchesGenre;
+          const matchesFormat = !formatFilter || album.format === formatFilter;
+          return matchesQuery && matchesArtist && matchesGenre && matchesFormat;
         })
         .forEach(album => {
           const card = document.createElement('div');
@@ -306,7 +256,24 @@
           grid.appendChild(card);
         });
     }
-  </script>
 
+    function pickRandomAlbum() {
+      const query = document.getElementById('collectionSearch').value.toLowerCase();
+      const artist = document.getElementById('filterArtist').value;
+      const genre = document.getElementById('filterGenre').value;
+      const format = document.getElementById('filterFormat').value;
+      const filtered = collection.filter(album => {
+        return (
+          (!query || album.title.toLowerCase().includes(query) || album.artist.toLowerCase().includes(query)) &&
+          (!artist || album.artist === artist) &&
+          (!genre || album.genre === genre) &&
+          (!format || album.format === format)
+        );
+      });
+      if (filtered.length === 0) return alert('No albums match your filters.');
+      const album = filtered[Math.floor(Math.random() * filtered.length)];
+      alert(`🎲 Random Album:\n${album.title} by ${album.artist}`);
+    }
+  </script>
 </body>
 </html>
