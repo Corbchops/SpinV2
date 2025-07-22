@@ -366,7 +366,6 @@ video:hover {
       <select id="columnViewSelect" onchange="changeGridColumns()" style="margin-left:auto; background:#444; color:#f0f0f0; border:none; border-radius:4px; padding:0.4rem 0.6rem; font-weight:bold; cursor:pointer;">
       <option value="1">1 Column</option>
       <option value="2" selected>2 Columns</option>
-      <option value="3">3 Columns</option>
   </select>
 </div>
     </div>
@@ -640,8 +639,12 @@ video:hover {
 
 // Call this once on load to set initial grid columns
 window.addEventListener('load', () => {
-  applyFilters();
+  // Only show filtered collection albums on collection tab load
+  if (document.getElementById('collectionView').style.display !== 'none') {
+    applyFilters();
+  }
   changeGridColumns();
+});
 });
   </script>
 </body>
