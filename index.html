@@ -1,8 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <title>My Music Collection</title>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://unpkg.com/@zxing/library@latest"></script>
@@ -22,13 +25,25 @@
     }
 
     body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--white);
-      padding-bottom: 3rem;
-    }
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--white);
+  padding-bottom: 3rem;
+}
+    header {
+  font-family: 'Bebas Neue', cursive;
+}
 
+.tab-button,
+.search-controls button,
+.filter-controls button,
+.album-card button,
+.album-card h3,
+.album-card p,
+input {
+  font-family: 'Inter', sans-serif;
+}
     header {
       background-color: var(--card-color);
       padding: 1rem;
@@ -49,24 +64,48 @@
       z-index: 2;
     }
 
-    .tab-button {
-      padding: 0.5rem 1rem;
+    .tab-button,
+    .search-controls button,
+    .filter-controls button,
+    .album-card button {
+      background-color: #444444; /* Dark gray */
+      color: var(--white);
       border: none;
+      padding: 0.5rem 1rem;
       border-radius: 4px;
-      background-color: var(--primary);
-      color: white;
       font-weight: bold;
       cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      user-select: none;
+    }
+
+    .tab-button:hover,
+    .search-controls button:hover,
+    .filter-controls button:hover,
+    .album-card button:hover {
+      background-color: #555555; /* Slightly lighter gray on hover */
+      transform: scale(1.05);
     }
 
     .tab-button.active {
-      background-color: var(--primary-dark);
+      background-color: #333333; /* Even darker for active tab */
     }
 
     .container {
       max-width: 1000px;
       margin: auto;
       padding: 1rem;
+      opacity: 1;
+      transition: opacity 0.4s ease;
+    }
+    .container.fade-out {
+      opacity: 0;
+      pointer-events: none;
+      user-select: none;
+      position: absolute;
+      width: 100%;
+      left: 0;
+      top: 3.5rem; /* to not jump behind tab bar */
     }
 
     .grid {
@@ -78,34 +117,57 @@
 
     .album-card {
       background-color: var(--card-color);
-      padding: 0.8rem;
-      border-radius: 6px;
+      padding: 1rem;
+      border-radius: 8px;
       text-align: center;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.4s ease;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+    }
+    .album-card:hover,
+    .album-card:focus-within {
+      transform: scale(1.03);
+      box-shadow: 0 6px 15px rgba(74, 144, 226, 0.5);
+      z-index: 1;
+    }
+
+    .album-card.pulse {
+      animation: pulse 0.6s ease forwards;
+    }
+
+    .album-card.popout {
+      animation: popoutFade 0.4s forwards;
     }
 
     .album-card img {
       width: 100%;
       height: auto;
-      max-height: 160px;
+      max-height: 180px;
       object-fit: contain;
       margin-bottom: 0.5rem;
-      border-radius: 4px;
+      border-radius: 6px;
     }
 
     .album-card h3, .album-card p {
       margin: 0.3rem 0;
+      font-size: 1.1rem;
     }
 
     .album-card button {
-      margin-top: 0.5rem;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 0.4rem 0.6rem;
-      cursor: pointer;
-      font-size: 0.8rem;
+      margin-top: 0.6rem;
+      font-size: 0.9rem;
+      padding: 0.5rem 0.8rem;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .button-shake {
+      animation: shake 0.4s ease;
     }
 
     .search-controls, .filter-controls {
@@ -116,31 +178,62 @@
       margin-bottom: 1rem;
     }
 
-    .search-controls input, .filter-controls input {
-      padding: 0.4rem;
-      border-radius: 4px;
+    .search-controls input,
+    .filter-controls input {
+      background-color: #333333; /* Dark gray input background */
+      color: var(--white);
       border: none;
-      font-size: 1rem;
+      border-radius: 4px;
+      padding: 0.5rem;
+      font-size: 1.1rem;
       width: 100%;
-      max-width: 200px;
+      max-width: 220px;
+      transition: box-shadow 0.3s ease;
     }
 
-    .search-controls button, .filter-controls button {
-      background-color: var(--primary);
-      border: none;
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
+    .search-controls input:focus,
+    .filter-controls input:focus {
+      outline: none;
+      box-shadow: 0 0 10px #666666;
     }
 
     video {
-      width: 100%;
-      max-width: 400px;
-      border-radius: 6px;
-      border: 2px solid var(--accent);
-      margin-top: 1rem;
-    }
+  width: 100%;
+  max-width: 400px;
+  margin: 2rem auto 1rem;
+  display: block;
+  border: 4px dashed var(--primary);
+  border-radius: 12px;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--bg-color),
+    var(--bg-color) 10px,
+    #333333 10px,
+    #333333 20px
+  );
+  box-shadow: 0 0 20px rgba(74, 144, 226, 0.5), 0 0 10px rgba(255, 255, 255, 0.1) inset;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+video::before {
+  content: '📷 Scan your barcode below!';
+  position: absolute;
+  top: -1.8rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--card-color);
+  padding: 0.3rem 1rem;
+  font-weight: bold;
+  color: var(--accent-light);
+  border-radius: 20px;
+  font-size: 1rem;
+  z-index: 1;
+}
+
+video:hover {
+  transform: scale(1.02);
+}
 
     @media screen and (max-width: 600px) {
       .tab-bar {
@@ -150,6 +243,96 @@
       .search-controls input, .filter-controls input {
         max-width: none;
       }
+
+      /* Make album cards bigger on mobile for easier tapping */
+      .album-card {
+        padding: 1.2rem;
+      }
+      .album-card h3, .album-card p {
+        font-size: 1.3rem;
+      }
+      .album-card button {
+        font-size: 1.1rem;
+        padding: 0.7rem 1rem;
+      }
+      .grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.2rem;
+      }
+    }
+
+    /* Animations */
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.7);
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 0 0 12px 6px rgba(74, 144, 226, 0.4);
+        transform: scale(1.06);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(74, 144, 226, 0);
+        transform: scale(1);
+      }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    @keyframes popoutFade {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.2);
+        height: 0;
+        margin: 0;
+        padding: 0;
+      }
+    }
+
+    /* Notification container and style */
+    #notification {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #333333;
+      color: var(--white);
+      padding: 1rem 1.5rem;
+      border-radius: 6px;
+      box-shadow: 0 0 15px rgba(74, 144, 226, 0.7);
+      font-weight: 600;
+      font-size: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      z-index: 9999;
+      max-width: 90vw;
+      text-align: center;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      justify-content: center;
+    }
+    #notification.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #notification img {
+      max-height: 40px;
+      max-width: 40px;
+      border-radius: 4px;
+      object-fit: contain;
+      box-shadow: 0 0 6px rgba(74, 144, 226, 0.7);
     }
   </style>
 </head>
@@ -180,8 +363,11 @@
       <button onclick="applyFilters()">Apply</button>
       <button onclick="pickRandomAlbum()">Pick Random</button>
     </div>
+    <div id="albumCount" style="text-align:center; margin-bottom: 0.8rem; font-weight: 600; color: var(--accent-light);"></div>
     <div class="grid" id="userCollection"></div>
   </div>
+
+  <div id="notification"></div>
 
   <script>
     const DISCOGS_API_KEY = 'YbIoxUTjiOnwgWuNEptY';
@@ -201,38 +387,84 @@
       localStorage.setItem('music_collection', JSON.stringify(collection));
     }
 
-    function switchTab(tab) {
-      document.getElementById('searchView').style.display = tab === 'search' ? 'block' : 'none';
-      document.getElementById('collectionView').style.display = tab === 'collection' ? 'block' : 'none';
-      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+    // Show notification message
+    function showNotification(message, coverImageUrl = null) {
+      const notif = document.getElementById('notification');
+      notif.innerHTML = '';
+      if (coverImageUrl) {
+        const img = document.createElement('img');
+        img.src = coverImageUrl;
+        img.alt = "Album cover";
+        notif.appendChild(img);
+      }
+      const text = document.createElement('span');
+      text.textContent = message;
+      notif.appendChild(text);
+      notif.classList.add('show');
+      clearTimeout(notif._timeout);
+      notif._timeout = setTimeout(() => {
+        notif.classList.remove('show');
+      }, 3500);
+    }
+
+    // Tab switching with fade animation
+    async function switchTab(tab) {
+      const searchView = document.getElementById('searchView');
+      const collectionView = document.getElementById('collectionView');
+      const tabButtons = document.querySelectorAll('.tab-button');
+
+      tabButtons.forEach(btn => btn.classList.remove('active'));
       document.querySelector(`.tab-button[onclick*="${tab}"]`).classList.add('active');
-      if (tab === 'collection') applyFilters();
+
+      // Fade out both containers first
+      searchView.classList.add('fade-out');
+      collectionView.classList.add('fade-out');
+
+      // Wait for fade out to complete (400ms)
+      await new Promise(resolve => setTimeout(resolve, 400));
+
+      if (tab === 'search') {
+        searchView.style.display = 'block';
+        collectionView.style.display = 'none';
+      } else {
+        searchView.style.display = 'none';
+        collectionView.style.display = 'block';
+        applyFilters();
+      }
+
+      // Remove fade-out to fade in
+      if (tab === 'search') searchView.classList.remove('fade-out');
+      else collectionView.classList.remove('fade-out');
     }
 
     async function searchAlbums() {
       const query = document.getElementById('searchInput').value.trim();
       if (!query) return;
 
-      const response = await axiosInstance.get('/database/search', {
-        params: {
-          q: query,
-          type: 'release',
-          per_page: 20,
-          key: DISCOGS_API_KEY,
-          secret: DISCOGS_API_SECRET,
-        },
-      });
+      try {
+        const response = await axiosInstance.get('/database/search', {
+          params: {
+            q: query,
+            type: 'release',
+            per_page: 20,
+            key: DISCOGS_API_KEY,
+            secret: DISCOGS_API_SECRET,
+          },
+        });
 
-      const albums = response.data.results.map(r => ({
-        title: r.title || 'Unknown Title',
-        year: r.year || 'Unknown Year',
-        genre: r.genre || [],
-        artist: r.artist || 'Unknown Artist',
-        format: r.format || [],
-        cover_image: r.cover_image || 'https://via.placeholder.com/100x100',
-      }));
+        const albums = response.data.results.map(r => ({
+          title: r.title || 'Unknown Title',
+          year: r.year || 'Unknown Year',
+          genre: r.genre || [],
+          artist: r.artist || 'Unknown Artist',
+          format: r.format || [],
+          cover_image: r.cover_image || 'https://via.placeholder.com/100x100',
+        }));
 
-      displayAlbums(albums, true);
+        displayAlbums(albums, true);
+      } catch {
+        showNotification('Error occurred while searching.');
+      }
     }
 
     function displayAlbums(albums, isSearch = false) {
@@ -240,55 +472,106 @@
       grid.innerHTML = '';
 
       albums.forEach((album, index) => {
+        const isAdded = collection.some(col => col.title === album.title && col.artist === album.artist && col.year === album.year);
         const card = document.createElement('div');
         card.className = 'album-card';
+        card.dataset.index = index;
+
+        let buttonHTML;
+        if (isSearch) {
+          if (isAdded) {
+            buttonHTML = `<button disabled style="background:#666666; cursor:default;">✔ Added</button>`;
+          } else {
+            // Use data-index attribute to find card in handler
+            buttonHTML = `<button onclick='handleAddButtonClick(this, ${JSON.stringify(album).replace(/'/g, "\\'").replace(/"/g, '&quot;')})'>Add</button>`;
+          }
+        } else {
+          buttonHTML = `<button onclick="removeFromCollection(${index}, this)">Remove</button>`;
+        }
+
         card.innerHTML = `
           <img src="${album.cover_image}" alt="${album.title}">
           <h3>${album.title}</h3>
           <p>${album.artist || 'Unknown Artist'}</p>
           <p>${album.year}</p>
           <p>${album.format.join(', ')}</p>
-          ${isSearch 
-            ? `<button onclick='addToCollection(${JSON.stringify(album).replace(/'/g, "\\'").replace(/"/g, '&quot;')})'>Add</button>`
-            : `<button onclick="removeFromCollection(${index})">Remove</button>`}
+          ${buttonHTML}
         `;
         grid.appendChild(card);
       });
     }
 
+    function handleAddButtonClick(button, album) {
+      // Animate button shake and card pulse
+      button.classList.add('button-shake');
+      const card = button.closest('.album-card');
+      card.classList.add('pulse');
+
+      setTimeout(() => {
+        button.classList.remove('button-shake');
+        card.classList.remove('pulse');
+
+        // Change button to disabled "Added" with checkmark
+        button.disabled = true;
+        button.style.background = '#666666';
+        button.style.cursor = 'default';
+        button.innerHTML = '✔ Added';
+      }, 600);
+
+      addToCollection(album);
+    }
+
     function addToCollection(album) {
       collection.push(album);
       saveCollection();
-      alert(`Added: ${album.title}`);
+      // No notification on add, per instructions
     }
 
-    function removeFromCollection(index) {
-      filteredCollection.splice(index, 1);
-      collection = [...filteredCollection];
-      saveCollection();
-      applyFilters();
+    function removeFromCollection(index, buttonElement) {
+      const grid = document.getElementById('userCollection');
+      const card = buttonElement.closest('.album-card');
+
+      card.classList.add('popout');
+
+      card.addEventListener('animationend', () => {
+        filteredCollection.splice(index, 1);
+        collection = [...filteredCollection];
+        saveCollection();
+        applyFilters();
+        showNotification('Album removed from your collection.');
+      }, { once: true });
     }
 
     function applyFilters() {
-      const genre = document.getElementById('filterGenre').value.trim().toLowerCase();
-      const artist = document.getElementById('filterArtist').value.trim().toLowerCase();
-      const format = document.getElementById('filterFormat').value.trim().toLowerCase();
+  const genre = document.getElementById('filterGenre').value.trim().toLowerCase();
+  const artist = document.getElementById('filterArtist').value.trim().toLowerCase();
+  const format = document.getElementById('filterFormat').value.trim().toLowerCase();
 
-      filteredCollection = collection.filter(album => {
-        const genreMatch = genre ? album.genre.some(g => g.toLowerCase().includes(genre)) : true;
-        const artistMatch = artist ? album.title.toLowerCase().includes(artist) : true;
-        const formatMatch = format ? album.format.some(f => f.toLowerCase().includes(format)) : true;
-        return genreMatch && artistMatch && formatMatch;
-      });
+  filteredCollection = collection.filter(album => {
+    const genreMatch = genre ? album.genre.some(g => g.toLowerCase().includes(genre)) : true;
+    const artistMatch = artist
+  ? (
+      (album.artist && album.artist.toLowerCase().includes(artist)) ||
+      (album.title && album.title.toLowerCase().includes(artist))
+    )
+  : true;
+    const formatMatch = format ? album.format.some(f => f.toLowerCase().includes(format)) : true;
+    return genreMatch && artistMatch && formatMatch;
+  });
 
-      displayAlbums(filteredCollection, false);
-    }
+  // Show count of filtered albums
+  document.getElementById('albumCount').textContent = `Albums found: ${filteredCollection.length}`;
 
+  displayAlbums(filteredCollection, false);
+}
     function pickRandomAlbum() {
       const pool = filteredCollection.length ? filteredCollection : collection;
-      if (pool.length === 0) return alert("No albums to pick from.");
+      if (pool.length === 0) {
+        showNotification("No albums to pick from.");
+        return;
+      }
       const album = pool[Math.floor(Math.random() * pool.length)];
-      alert(`🎲 Random Pick: ${album.title}`);
+      showNotification(`🎲 Random Pick: ${album.title}`, album.cover_image);
     }
 
     async function startScanner() {
@@ -302,7 +585,7 @@
           }
         });
       } catch (error) {
-        alert('Unable to access camera.');
+        showNotification('Unable to access camera.');
       }
     }
 
@@ -329,12 +612,17 @@
         if (results.length) {
           displayAlbums(results, true);
         } else {
-          alert('No results found for barcode.');
+          showNotification('No albums found with that barcode.');
         }
-      } catch (e) {
-        alert('Error searching barcode.');
+      } catch {
+        showNotification('Error fetching album from barcode.');
       }
     }
+
+    // Initialize collection view on load
+    window.addEventListener('load', () => {
+      applyFilters();
+    });
   </script>
 </body>
 </html>
