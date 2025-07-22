@@ -630,6 +630,19 @@ video:hover {
     window.addEventListener('load', () => {
       applyFilters();
     });
+    function changeGridColumns() {
+  const select = document.getElementById('columnViewSelect');
+  const grid = document.getElementById('userCollection');
+  const cols = select.value;
+
+  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+}
+
+// Call this once on load to set initial grid columns
+window.addEventListener('load', () => {
+  applyFilters();
+  changeGridColumns();
+});
   </script>
 </body>
 </html>
