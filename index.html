@@ -362,6 +362,13 @@ video:hover {
       <input type="text" id="filterFormat" placeholder="Filter by Format">
       <button onclick="applyFilters()">Apply</button>
       <button onclick="pickRandomAlbum()">Pick Random</button>
+        <!-- Add this dropdown -->
+      <select id="columnViewSelect" onchange="changeGridColumns()" style="margin-left:auto; background:#444; color:#f0f0f0; border:none; border-radius:4px; padding:0.4rem 0.6rem; font-weight:bold; cursor:pointer;">
+      <option value="1">1 Column</option>
+      <option value="2" selected>2 Columns</option>
+      <option value="3">3 Columns</option>
+  </select>
+</div>
     </div>
     <div id="albumCount" style="text-align:center; margin-bottom: 0.8rem; font-weight: 600; color: var(--accent-light);"></div>
     <div class="grid" id="userCollection"></div>
