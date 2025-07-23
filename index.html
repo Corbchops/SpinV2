@@ -362,12 +362,6 @@ video:hover {
       <input type="text" id="filterFormat" placeholder="Filter by Format">
       <button onclick="applyFilters()">Apply</button>
       <button onclick="pickRandomAlbum()">Pick Random</button>
-        <!-- Add this dropdown -->
-      <select id="columnViewSelect" onchange="changeGridColumns()" style="margin-left:auto; background:#444; color:#f0f0f0; border:none; border-radius:4px; padding:0.4rem 0.6rem; font-weight:bold; cursor:pointer;">
-      <option value="1">1 Column</option>
-      <option value="2" selected>2 Columns</option>
-  </select>
-</div>
     </div>
     <div id="albumCount" style="text-align:center; margin-bottom: 0.8rem; font-weight: 600; color: var(--accent-light);"></div>
     <div class="grid" id="userCollection"></div>
@@ -474,38 +468,47 @@ video:hover {
     }
 
     function displayAlbums(albums, isSearch = false) {
-      const grid = isSearch ? document.getElementById('catalogue') : document.getElementById('userCollection');
-      grid.innerHTML = '';
+  const grid = isSearch ? document.getElementById('catalogue') : document.getElementById('userCollection');
+  grid.innerHTML = '';
 
-      albums.forEach((album, index) => {
-        const isAdded = collection.some(col => col.title === album.title && col.artist === album.artist && col.year === album.year);
-        const card = document.createElement('div');
-        card.className = 'album-card';
-        card.dataset.index = index;
+  albums.forEach((album, index) => {
+    const isAdded = collection.some(col => col.title === album.title && col.artist === album.artist && col.year === album.year);
+    const card = document.createElement('div');
+    card.className = 'album-card';
+    card.dataset.index = index;
 
-        let buttonHTML;
-        if (isSearch) {
-          if (isAdded) {
-            buttonHTML = `<button disabled style="background:#666666; cursor:default;">✔ Added</button>`;
-          } else {
-            // Use data-index attribute to find card in handler
-            buttonHTML = `<button onclick='handleAddButtonClick(this, ${JSON.stringify(album).replace(/'/g, "\\'").replace(/"/g, '&quot;')})'>Add</button>`;
-          }
-        } else {
-          buttonHTML = `<button onclick="removeFromCollection(${index}, this)">Remove</button>`;
-        }
+    card.innerHTML = `
+      <img src="${album.cover_image}" alt="${album.title}">
+      <h3>${album.title}</h3>
+      <p>${album.artist || 'Unknown Artist'}</p>
+      <p>${album.year}</p>
+      <p>${album.format.join(', ')}</p>
+    `;
 
-        card.innerHTML = `
-          <img src="${album.cover_image}" alt="${album.title}">
-          <h3>${album.title}</h3>
-          <p>${album.artist || 'Unknown Artist'}</p>
-          <p>${album.year}</p>
-          <p>${album.format.join(', ')}</p>
-          ${buttonHTML}
-        `;
-        grid.appendChild(card);
-      });
+    if (isSearch) {
+      if (isAdded) {
+        const disabledBtn = document.createElement('button');
+        disabledBtn.textContent = '✔ Added';
+        disabledBtn.disabled = true;
+        disabledBtn.style.background = '#666666';
+        disabledBtn.style.cursor = 'default';
+        card.appendChild(disabledBtn);
+      } else {
+        const addBtn = document.createElement('button');
+        addBtn.textContent = 'Add';
+        addBtn.addEventListener('click', () => handleAddButtonClick(addBtn, album));
+        card.appendChild(addBtn);
+      }
+    } else {
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = 'Remove';
+      removeBtn.addEventListener('click', () => removeFromCollection(index, removeBtn));
+      card.appendChild(removeBtn);
     }
+
+    grid.appendChild(card);
+  });
+}
 
     function handleAddButtonClick(button, album) {
       // Animate button shake and card pulse
@@ -540,8 +543,12 @@ video:hover {
       card.classList.add('popout');
 
       card.addEventListener('animationend', () => {
-        filteredCollection.splice(index, 1);
-        collection = [...filteredCollection];
+        const albumToRemove = filteredCollection[index];
+        collection = collection.filter(album => {
+        return !(album.title === albumToRemove.title &&
+                 album.artist === albumToRemove.artist &&
+                 album.year === albumToRemove.year);
+        });
         saveCollection();
         applyFilters();
         showNotification('Album removed from your collection.');
@@ -629,23 +636,6 @@ video:hover {
     window.addEventListener('load', () => {
       applyFilters();
     });
-    function changeGridColumns() {
-  const select = document.getElementById('columnViewSelect');
-  const grid = document.getElementById('userCollection');
-  const cols = select.value;
-
-  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-}
-
-// Call this once on load to set initial grid columns
-window.addEventListener('load', () => {
-  // Only show filtered collection albums on collection tab load
-  if (document.getElementById('collectionView').style.display !== 'none') {
-    applyFilters();
-  }
-  changeGridColumns();
-});
-});
   </script>
 </body>
 </html>
